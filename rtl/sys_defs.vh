@@ -59,6 +59,10 @@
 `define SLT_INST    {3'h2, 7'h00}
 `define SLTU_INST   {3'h3, 7'h00}
 
+//for mul mulh
+`define MUL_INST    {3'h0, 7'h10}
+`define MULH_INST   {3'h1, 7'h10}
+
 //
 //{funct3}, I-TYPE
 //
@@ -125,6 +129,10 @@
 `define	ALU_SRA   5'h07
 `define	ALU_SLT   5'h08
 `define	ALU_SLTU  5'h09
+
+//for mul mulh
+`define	ALU_MUL   5'hA
+`define	ALU_MULH  5'hB
 
 //
 // Memory bus commands control signals

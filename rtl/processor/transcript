@@ -1,0 +1,86 @@
+# Reading pref.tcl
+# OpenFile //wsl.localhost/Ubuntu/home/ioanstag1/CompArchCourseDUTH/rtl/processor/processor.sv
+cd //wsl.localhost/Ubuntu/home/ioanstag1/CompArchCourseDUTH/rtl/simulation
+vlib work
+# ** Warning: (vlib-34) Library already exists at "work".
+do simulation.do
+# Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+# Start time: 22:18:20 on Mar 12,2023
+# vlog -reportprogress 300 -f files_rtl.f 
+# -- Compiling module if_stage
+# -- Compiling module regfile
+# -- Compiling module inst_decoder
+# -- Compiling module id_stage
+# -- Compiling module ex_stage
+# -- Compiling module alu
+# -- Compiling module mem_stage
+# -- Compiling module wb_stage
+# -- Compiling module processor
+# -- Compiling module mem
+# -- Compiling module processor_tb
+# 
+# Top level modules:
+# 	processor_tb
+# End time: 22:18:21 on Mar 12,2023, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 0
+# vsim processor_tb 
+# Start time: 22:18:22 on Mar 12,2023
+# Loading sv_std.std
+# Loading work.processor_tb
+# Loading work.processor
+# Loading work.if_stage
+# Loading work.id_stage
+# Loading work.regfile
+# Loading work.inst_decoder
+# Loading work.ex_stage
+# Loading work.alu
+# Loading work.mem_stage
+# Loading work.wb_stage
+# Loading work.mem
+# ** Note: $stop    : processor_tb.sv(128)
+#    Time: 500005 ps  Iteration: 1  Instance: /processor_tb
+# Break in Module processor_tb at processor_tb.sv line 128
+add wave -position insertpoint sim:/processor_tb/*
+add wave -position insertpoint sim:/processor_tb/proc_module/*
+do simulation.do
+# End time: 22:30:26 on Mar 12,2023, Elapsed time: 0:12:04
+# Errors: 0, Warnings: 0
+# Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+# Start time: 22:30:26 on Mar 12,2023
+# vlog -reportprogress 300 -f files_rtl.f 
+# -- Compiling module if_stage
+# -- Compiling module regfile
+# -- Compiling module inst_decoder
+# -- Compiling module id_stage
+# -- Compiling module ex_stage
+# -- Compiling module alu
+# -- Compiling module mem_stage
+# -- Compiling module wb_stage
+# -- Compiling module processor
+# -- Compiling module mem
+# -- Compiling module processor_tb
+# 
+# Top level modules:
+# 	processor_tb
+# End time: 22:30:27 on Mar 12,2023, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 0
+# vsim processor_tb 
+# Start time: 22:30:27 on Mar 12,2023
+# Loading sv_std.std
+# Loading work.processor_tb
+# Loading work.processor
+# Loading work.if_stage
+# Loading work.id_stage
+# Loading work.regfile
+# Loading work.inst_decoder
+# Loading work.ex_stage
+# Loading work.alu
+# Loading work.mem_stage
+# Loading work.wb_stage
+# Loading work.mem
+# ** Note: $stop    : processor_tb.sv(128)
+#    Time: 1005 ps  Iteration: 1  Instance: /processor_tb
+# Break in Module processor_tb at processor_tb.sv line 128
+add wave -position insertpoint sim:/processor_tb/proc_module/ex_stage_0/*
+# End time: 22:33:09 on Mar 12,2023, Elapsed time: 0:02:42
+# Errors: 0, Warnings: 0

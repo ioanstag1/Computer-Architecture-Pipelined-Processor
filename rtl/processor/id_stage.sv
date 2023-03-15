@@ -51,6 +51,8 @@ always_comb begin
 				`SRA_INST  : alu_func = `ALU_SRA;   
 				`SLT_INST  : alu_func = `ALU_SLT;   
 				`SLTU_INST : alu_func = `ALU_SLTU;
+				`MUL_INST : alu_func =  `ALU_MUL;
+				`MULH_INST : alu_func = `ALU_MULH;
 				default: illegal = `TRUE;
 			endcase 
 		end //R-TYPE
@@ -159,7 +161,7 @@ input logic 		clk,              		// system clk
 input logic 		rst,              		// system rst
 input logic [31:0] 	if_id_IR,            	// incoming instruction
 input logic [31:0]	if_id_PC,
-input logic	        mem_wb_valid_inst,   	 	//Does the instruction write to rd?
+input logic	        mem_wb_valid_inst,   	 //Does the instruction write to rd?
 input logic	        mem_wb_reg_wr,   	 	//Does the instruction write to rd?
 input logic [4:0]	mem_wb_dest_reg_idx, 	//index of rd
 input logic [31:0] 	wb_reg_wr_data_out, 	// Reg write data from WB Stage
