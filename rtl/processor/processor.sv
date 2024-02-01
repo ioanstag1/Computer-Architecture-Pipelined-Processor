@@ -24,31 +24,37 @@ module processor(
 	output logic [31:0] if_PC_out,
 	output logic [31:0] if_NPC_out,
 	output logic [31:0] if_IR_out,
-	output logic        if_valid_inst_out,
+	
+
 
 	// Outputs from IF/ID Pipeline Register
 	output logic [31:0] if_id_PC,
 	output logic [31:0] if_id_NPC,
 	output logic [31:0] if_id_IR,
-	output logic        if_id_valid_inst,
+
 
 	// Outputs from ID/EX Pipeline Register
 	output logic [31:0] id_ex_PC,
 	output logic [31:0] id_ex_NPC,
 	output logic [31:0] id_ex_IR,
-	output logic   		id_ex_valid_inst,
+
+
 
 
 	// Outputs from EX/MEM Pipeline Register
 	output logic [31:0] ex_mem_NPC,
 	output logic [31:0] ex_mem_IR,
-	output logic   		ex_mem_valid_inst,
+
 
 
 	// Outputs from MEM/WB Pipeline Register
+
 	output logic [31:0] mem_wb_NPC,
-	output logic [31:0] mem_wb_IR,
-	output logic   		mem_wb_valid_inst);
+	output logic [31:0] mem_wb_IR);
+
+
+//output from HzUN
+logic hazard_found;
 
 // Pipeline register enables
 logic 			if_id_enable, id_ex_enable, ex_mem_enable, mem_wb_enable;
@@ -72,6 +78,11 @@ logic 			id_uncond_branch;
 logic 			id_cond_branch;
 logic [31:0]    id_pc_add_opa;
 
+//for HzUN
+logic[4:0] ra; 
+logic[4:0] rb; 
+
+
 // Outputs from ID/EX Pipeline Register
 logic 			id_ex_reg_wr;
 logic [2:0]		id_ex_funct3;
@@ -93,6 +104,9 @@ logic [31:0]    id_ex_pc_add_opa;
 logic [31:0] 	ex_target_PC_out;
 logic 			ex_take_branch_out;
 logic [31:0] 	ex_alu_result_out;
+
+
+
 
 // Outputs from EX/MEM Pipeline Register
 logic [2:0]		ex_mem_funct3;
@@ -139,22 +153,24 @@ assign pipeline_commit_wr 		= mem_wb_reg_wr;
 //                  IF-Stage                    //
 //                                              //
 //////////////////////////////////////////////////
+
+
 if_stage if_stage_0 (
 // Inputs
 .clk 				(clk),
 .rst 				(rst),
-.mem_wb_valid_inst	(mem_wb_valid_inst),
+
 .ex_take_branch_out	(ex_mem_take_branch),
 .ex_target_PC_out	(ex_mem_target_PC),
 .Imem2proc_data		(instruction),
-
+.hazard             (hazard_found),
 
 // Outputs
 .if_NPC_out			(if_NPC_out),
 .if_PC_out			(if_PC_out), 
 .if_IR_out			(if_IR_out),
-.proc2Imem_addr		(pc_addr),
-.if_valid_inst_out  (if_valid_inst_out)
+.proc2Imem_addr		(pc_addr)
+
 );
 
 //////////////////////////////////////////////////
@@ -162,20 +178,20 @@ if_stage if_stage_0 (
 //            IF/ID Pipeline Register           //
 //                                              //
 //////////////////////////////////////////////////
-assign if_id_enable = 1;
+assign if_id_enable = !hazard_found ;
 
 always_ff @(posedge clk or posedge rst) begin
-	if(rst) begin
+	if(rst || ex_take_branch_out || ex_mem_take_branch) begin
 		if_id_PC         <=  0;
 		if_id_IR         <=  `NOOP_INST;
 		if_id_NPC        <=  0;
-        if_id_valid_inst <=  0;
+
     end 
     else if (if_id_enable) begin
 		if_id_PC         <=  if_PC_out;
 		if_id_NPC        <=  if_NPC_out;
 		if_id_IR         <=  if_IR_out;
-        if_id_valid_inst <= if_valid_inst_out;
+ 
     end 
 end 
 
@@ -185,6 +201,8 @@ end
 //                  ID-Stage                    //
 //                                              //
 //////////////////////////////////////////////////
+
+
 id_stage id_stage_0 (
 // Inputs
 .clk     				(clk),
@@ -192,10 +210,10 @@ id_stage id_stage_0 (
 .if_id_IR   			(if_id_IR),
 .if_id_PC				(if_id_PC),
 .mem_wb_dest_reg_idx	(mem_wb_dest_reg_idx),
-.mem_wb_valid_inst    	(mem_wb_valid_inst),
+
 .mem_wb_reg_wr			(mem_wb_reg_wr), 
 .wb_reg_wr_data_out     (wb_reg_wr_data_out),  	
-.if_id_valid_inst       (if_id_valid_inst),
+
 
 // Outputs
 .id_reg_wr_out          (id_reg_wr_out),
@@ -213,18 +231,99 @@ id_stage id_stage_0 (
 .cond_branch			(id_cond_branch),
 .uncond_branch			(id_uncond_branch),
 .id_illegal_out			(id_illegal_out),
-.id_valid_inst_out		(id_valid_inst_out)
+.id_valid_inst_out		(id_valid_inst_out),
+
+
+.rs1(ra),
+.rs2(rb)
 );
+
+
+
+//////////////////////////////////////////////////
+//                                              //
+//                  HAZARD UNIT                 //
+//                                              //
+//////////////////////////////////////////////////
+
+
+
+
+
+// hazard_unit HzUN(.rs1(ra),
+// 				.rs2(rb),
+// 				.id_ex_reg(id_ex_dest_reg_idx),
+// 				.ex_mem_reg(ex_mem_dest_reg_idx),
+// 				.id_ex_rd_mem(id_ex_rd_mem),
+// 				.stall(hazard_found));
+
+//hazard stall the PC
+
+hazard_unit HzUN(.rs1(ra),
+				.rs2(rb),
+				.id_ex_reg(id_ex_dest_reg_idx),
+				.ex_mem_rd_mem(ex_mem_rd_mem),
+				.ex_mem_reg(ex_mem_dest_reg_idx),
+				.mem_wb_reg(mem_wb_dest_reg_idx),
+				.id_ex_rd_mem(id_ex_rd_mem),
+				.id_ex_imm(id_ex_imm),
+				.id_immediate_out(id_immediate_out),
+				.stall(hazard_found));
+
+//hazard stall the PC
+
+
+
+//////////////////////////////////////////////////
+//                                              //
+//                  FORWARD	UNIT	            //
+//                                              //
+//////////////////////////////////////////////////
+
+
+logic forward_rs1;
+logic forward_rs2;
+ 
+logic [31:0] forward_rega_out;
+logic [31:0] forward_regb_out;
+
+ForwardUnit FwUN(.if_id_rs1(ra),
+				.if_id_rs2(rb),
+
+				
+				
+				.id_ex_dest_reg_idx(id_ex_dest_reg_idx),
+				.ex_mem_dest_reg_idx(ex_mem_dest_reg_idx),
+
+				
+				.ex_mem_rd_mem(ex_mem_rd_mem),
+
+				.id_ex_rd_mem(id_ex_rd_mem),
+				
+				.stall(hazard_found),
+				
+				.ex_alu_result_out(ex_alu_result_out),
+				.mem_result_out(mem_result_out),
+				
+				.mem_wb_dest_reg_idx(mem_wb_dest_reg_idx),
+				.wb_reg_wr_data_out(wb_reg_wr_data_out),
+				
+				.forward_rs1(forward_rs1),
+				.forward_rs2(forward_rs2),
+				.forward_rega_out(forward_rega_out),
+				.forward_regb_out(forward_regb_out));
+
+
 
 //////////////////////////////////////////////////
 //                                              //
 //            ID/EX Pipeline Register           //
 //                                              //
 //////////////////////////////////////////////////
-assign id_ex_enable =1; // disabled when HzDU initiates a stall
+assign id_ex_enable = 1; // disabled when HzDU initiates a stall
 // synopsys sync_set_rst "rst"
 always_ff @(posedge clk or posedge rst) begin
-	if (rst) begin //sys_rst
+	if (rst || hazard_found ||ex_take_branch_out || ex_mem_take_branch) begin //sys_rst
 		//Control
 		id_ex_funct3		<=  0;
 		id_ex_opa_select    <=  `ALU_OPA_IS_REGA;
@@ -233,7 +332,7 @@ always_ff @(posedge clk or posedge rst) begin
 		id_ex_rd_mem        <=  0;
 		id_ex_wr_mem        <=  0;
 		id_ex_illegal       <=  0;
-		id_ex_valid_inst    <=  `FALSE;
+
         id_ex_reg_wr        <=  `FALSE;
 		
 		//Data
@@ -258,23 +357,41 @@ always_ff @(posedge clk or posedge rst) begin
 			id_ex_rd_mem        <=  id_rd_mem_out;
 			id_ex_wr_mem        <=  id_wr_mem_out;
 			id_ex_illegal       <=  id_illegal_out;
-			id_ex_valid_inst    <=  id_valid_inst_out;
+
             id_ex_reg_wr        <=  id_reg_wr_out;
 			
 			id_ex_PC            <=  if_id_PC;
 			id_ex_IR            <=  if_id_IR;
-			id_ex_rega          <=  id_rega_out;
-			id_ex_regb          <=  id_regb_out;
+			
+			
 			id_ex_imm			<=  id_immediate_out;
 			id_ex_dest_reg_idx  <=  id_dest_reg_idx_out;
 			
 			id_ex_NPC           <=  if_id_NPC;
-			id_ex_pc_add_opa	<=  id_pc_add_opa;
+			
 			id_ex_uncond_branch <=  id_uncond_branch;
 			id_ex_cond_branch	<=  id_cond_branch;
+			// Forwarding logic
+		if (forward_rs1) begin
+    		id_ex_rega <= forward_rega_out; // Forward rs1
+			if (if_id_IR[6:0] == `I_JAL_TYPE)
+				id_ex_pc_add_opa <= forward_rega_out;
+		end
+		else begin
+    		id_ex_rega <= id_rega_out;
+			id_ex_pc_add_opa	<=  id_pc_add_opa;
+		end
+
+		if (forward_rs2)
+    		id_ex_regb <= forward_regb_out; // Forward rs2
+		else
+    		id_ex_regb <= id_regb_out;
 		end // if
+
     end // else: !if(rst)
 end // always
+
+
 
 //////////////////////////////////////////////////
 //                                              //
@@ -292,7 +409,7 @@ ex_stage ex_stage_0 (
 .id_ex_opa_select		(id_ex_opa_select),
 .id_ex_opb_select		(id_ex_opb_select),
 .id_ex_alu_func			(id_ex_alu_func),
-.id_ex_valid_inst		(id_ex_valid_inst),
+
 .pc_add_opa				(id_ex_pc_add_opa),
 .id_ex_funct3			(id_ex_funct3),
 .uncond_branch			(id_ex_uncond_branch),
@@ -300,8 +417,7 @@ ex_stage ex_stage_0 (
 // Outputs
 .ex_take_branch_out		(ex_take_branch_out),
 .ex_target_PC_out		(ex_target_PC_out),
-.ex_alu_result_out		(ex_alu_result_out)
-);
+.ex_alu_result_out		(ex_alu_result_out));
 
 //////////////////////////////////////////////////
 //                                              //
@@ -317,7 +433,7 @@ always_ff @(posedge clk or posedge rst) begin
 		ex_mem_rd_mem       <=  0;
 		ex_mem_wr_mem       <=  0;
 		ex_mem_illegal      <=  0;
-		ex_mem_valid_inst   <=  `FALSE;
+
 		ex_mem_reg_wr       <=  `FALSE;
 		//Data
 		ex_mem_IR           <=  `NOOP_INST;
@@ -334,7 +450,7 @@ always_ff @(posedge clk or posedge rst) begin
 			ex_mem_rd_mem       <=  id_ex_rd_mem;
 			ex_mem_wr_mem       <=  id_ex_wr_mem;
 			ex_mem_illegal      <=  id_ex_illegal;
-			ex_mem_valid_inst   <=  id_ex_valid_inst;
+
 		    ex_mem_reg_wr       <=  id_ex_reg_wr;
 		
 			ex_mem_IR           <=  id_ex_IR;
@@ -347,6 +463,7 @@ always_ff @(posedge clk or posedge rst) begin
 		end // if
 	end // else: !if(rst)
 end // always
+
 
    
 //////////////////////////////////////////////////
@@ -364,7 +481,7 @@ mem_stage mem_stage_0 (
 .ex_mem_rd_mem		(ex_mem_rd_mem),
 .ex_mem_wr_mem		(ex_mem_wr_mem),
 .Dmem2proc_data		(mem2proc_data),
-.ex_mem_valid_inst	(ex_mem_valid_inst),
+
 
 // Outputs
 .mem_result_out		(mem_result_out),
@@ -386,7 +503,7 @@ always_ff @(posedge clk or posedge rst) begin
 		//Control 
 		mem_wb_funct3		<=  0;
 		mem_wb_illegal      <=  0;
-		mem_wb_valid_inst   <=  `FALSE;
+
 		mem_wb_rd_mem    	<=  `FALSE;
         mem_wb_reg_wr       <=  `FALSE;
 		//Data
@@ -402,7 +519,7 @@ always_ff @(posedge clk or posedge rst) begin
 			mem_wb_funct3		<=  ex_mem_funct3;
 			mem_wb_rd_mem    	<=  ex_mem_rd_mem;
 			mem_wb_illegal      <=  ex_mem_illegal;
-			mem_wb_valid_inst   <=  ex_mem_valid_inst;
+
 			
             mem_wb_reg_wr       <=  ex_mem_reg_wr;
 			mem_wb_IR           <=  ex_mem_IR;
@@ -415,6 +532,8 @@ always_ff @(posedge clk or posedge rst) begin
 	end // else: !if(rst)
 end // always
 
+
+
 //////////////////////////////////////////////////
 //                                              //
 //                  WB-Stage                    //
@@ -424,7 +543,7 @@ wb_stage wb_stage_0(
 .mem_wb_mem_result	(mem_wb_mem_result),
 .mem_wb_alu_result	(mem_wb_alu_result),
 .mem_wb_rd_mem		(mem_wb_rd_mem),
-.mem_wb_valid_inst  (mem_wb_valid_inst),
+
 		
 .wb_reg_wr_data_out	(wb_reg_wr_data_out)
 );

@@ -6,7 +6,7 @@
 
 module inst_decoder(
 input [31:0] 		inst,
-input logic valid_inst_in,  // ignore inst when low, outputs will
+  // ignore inst when low, outputs will
 					        // reflect noop (except valid_inst)
 
 output logic [1:0] 	opa_select,
@@ -16,9 +16,10 @@ output logic [4:0]  alu_func,
 output logic 		rd_mem,wr_mem, cond_branch, uncond_branch,
 output logic 		illegal,    // non-zero on an illegal instruction
 output logic 		valid_inst  // for counting valid instructions executed
+
 );
 
-assign valid_inst =valid_inst_in & ~illegal;
+assign valid_inst = ~illegal;
 
 always_comb begin
 	// - invalid instructions should clear valid_inst.
@@ -52,7 +53,7 @@ always_comb begin
 				`SLT_INST  : alu_func = `ALU_SLT;   
 				`SLTU_INST : alu_func = `ALU_SLTU;
 				`MUL_INST : alu_func =  `ALU_MUL;
-				`MULH_INST : alu_func = `ALU_MULH;
+				`MULHU_INST : alu_func = `ALU_MULHU;
 				default: illegal = `TRUE;
 			endcase 
 		end //R-TYPE
@@ -161,11 +162,11 @@ input logic 		clk,              		// system clk
 input logic 		rst,              		// system rst
 input logic [31:0] 	if_id_IR,            	// incoming instruction
 input logic [31:0]	if_id_PC,
-input logic	        mem_wb_valid_inst,   	 //Does the instruction write to rd?
+
 input logic	        mem_wb_reg_wr,   	 	//Does the instruction write to rd?
 input logic [4:0]	mem_wb_dest_reg_idx, 	//index of rd
 input logic [31:0] 	wb_reg_wr_data_out, 	// Reg write data from WB Stage
-input logic         if_id_valid_inst,
+
 
 output logic [31:0] id_ra_value_out,    	// reg A value
 output logic [31:0] id_rb_value_out,    	// reg B value
@@ -184,7 +185,11 @@ output logic 	    id_wr_mem_out,          // does inst write memory?
 output logic 		cond_branch,
 output logic        uncond_branch,
 output logic       	id_illegal_out,
-output logic       	id_valid_inst_out	  	// is inst a valid instruction to be counted for CPI calculations?
+output logic       	id_valid_inst_out,  	// is inst a valid instruction to be counted for CPI calculations?
+
+
+output logic [4:0] 	    rs1,
+output logic [4:0]		rs2
 );
    
 logic dest_reg_select;
@@ -200,8 +205,12 @@ assign rb_idx=if_id_IR[24:20];	// inst operand B register index
 assign rc_idx=if_id_IR[11:7];  // inst operand C register index
 // Instantiate the register file used by this pipeline
 
+
+assign rs1=ra_idx;
+assign rs2=rb_idx;
+
 logic write_en;
-assign write_en=mem_wb_valid_inst & mem_wb_reg_wr;
+assign write_en=mem_wb_reg_wr;
 
 regfile regf_0(.clk		(clk),
 			   .rst		(rst),
@@ -217,7 +226,7 @@ assign id_rb_value_out=rb_val;
 
 // instantiate the instruction inst_decoder
 inst_decoder inst_decoder_0(.inst	        (if_id_IR),
-							.valid_inst_in  (if_id_valid_inst),
+
 							.opa_select		(id_opa_select_out),
 							.opb_select		(id_opb_select_out),
 							.alu_func		(id_alu_func_out),
@@ -248,7 +257,6 @@ always_comb begin
 end
 
 //ultimate "take branch" signal: unconditional, or conditional and the condition is true
-
 
 //set up possible immediates:
 //jmp_disp: 20-bit sign-extended immediate for jump displacement;
@@ -287,3 +295,29 @@ assign pc_add_opa =(if_id_IR[6:0] == `I_JAL_TYPE)? id_ra_value_out:if_id_PC;
 assign id_funct3_out = if_id_IR[14:12];
 
 endmodule // module id_stage
+
+
+module hazard_unit(
+
+input logic [4:0]rs1,
+input logic [4:0]rs2,
+
+input logic [4:0] id_ex_reg,
+input logic [4:0] ex_mem_reg,
+input logic       id_ex_rd_mem,
+input logic       ex_mem_rd_mem,
+input logic [31:0] id_ex_imm,
+input logic [31:0] id_immediate_out,
+input logic 	[4:0]	mem_wb_reg,
+output logic		stall
+);
+
+logic 		stall_a;
+logic		stall_b;
+
+assign stall_a = (rs1 != 0) & ((ex_mem_rd_mem & rs1 == ex_mem_reg)|(id_ex_rd_mem & rs1 == id_ex_reg & id_ex_imm!=id_immediate_out)) ;
+assign stall_b = (rs2 != 0) & ((ex_mem_rd_mem & rs2 == ex_mem_reg)|(id_ex_rd_mem & rs2 == id_ex_reg & id_ex_imm!=id_immediate_out)) ;
+  
+assign stall = (stall_a | stall_b)  ;
+
+endmodule 

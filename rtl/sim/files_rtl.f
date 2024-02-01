@@ -7,6 +7,6 @@
 ../processor/mem_stage.sv
 ../processor/wb_stage.sv
 ../processor/processor.sv
-
+../processor/forwarding.sv
 memory.sv
 processor_tb.sv

@@ -12,7 +12,7 @@ input logic [31:0]  id_ex_regb,          // register B value from reg file
 input logic [1:0] 	id_ex_opa_select,    // opA mux select from decoder
 input logic [1:0] 	id_ex_opb_select,    // opB mux select from decoder
 input logic [4:0]   id_ex_alu_func,      // ALU function select from decoder
-input logic 		id_ex_valid_inst,
+
 //branch
 input logic [31:0]  pc_add_opa,
 input logic [2:0]   id_ex_funct3,
@@ -22,7 +22,7 @@ input logic 		cond_branch,
 output logic 		ex_take_branch_out,
 output logic [31:0] ex_target_PC_out,
 output logic [31:0] ex_alu_result_out    // The arithmetic result. Needs to be renamed
-);
+						);
 
 logic [31:0] alu_opa, alu_opb;
 
@@ -68,8 +68,9 @@ alu alu_0 (// Inputs
 
 assign ex_target_PC_out = pc_add_opa + id_ex_imm;
 
-assign ex_take_branch_out = (uncond_branch | (cond_branch & brcond_result)) & id_ex_valid_inst;
+assign ex_take_branch_out = (uncond_branch | (cond_branch & brcond_result));
 //
+
 
 assign ex_alu_result_out=alu_result;
 
@@ -113,7 +114,7 @@ always_comb begin
 		`ALU_SLT: 	result = {31'd0, ($signed(opa)< $signed(opb))};
 		`ALU_SLTU:	result = {31'd0, (opa < opb)};
 		`ALU_MUL:   result = temp[31:0];
-		`ALU_MULH:  result = temp[63:32];
+		`ALU_MULHU:  result = temp[63:32];
 		default: 	result = 32'hbaadbeef;  
 	endcase	
 end
@@ -131,5 +132,6 @@ always_comb begin
 		brcond_result = ~brcond_result;
 
 end
+
 
 endmodule // alu

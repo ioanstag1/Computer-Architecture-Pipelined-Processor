@@ -8,28 +8,28 @@ z2
 !i10e 25
 !i10f 100
 cModel Technology
-Z0 d//wsl.localhost/Ubuntu/home/ioanstag1/CompArchCourseDUTH/rtl/simulation
+Z0 d//wsl.localhost/Ubuntu/home/ioanstag1/CompArchCourseDUTH_LAB3/rtl/simulation
 valu
 Z1 DXx6 sv_std 3 std 0 22 VYECXdT12H8WgbUP_5Y6:3
-Z2 !s110 1678822683
+Z2 !s110 1684018483
 !i10b 1
-!s100 U?9dRQJncef6?zNA_c7YV1
+!s100 o9QN3b]k:a8_@l0LlWV7T0
 Z3 !s11b Dg1SIo80bB@j0V0VzS_@n1
-I^SOVB^:=MV6LlKTN1RZY@2
+I2SB_XzZkANXhjeVZdkZmg3
 Z4 VDg1SIo80bB@j0V0VzS_@n1
 S1
 R0
-Z5 w1678636458
+Z5 w1680442838
 Z6 8../processor/ex_stage.sv
 Z7 F../processor/ex_stage.sv
 !i122 0
-L0 88 48
+L0 89 49
 Z8 OV;L;2020.1;71
 r1
 !s85 0
 31
-Z9 !s108 1678822682.000000
-!s107 processor_tb.sv|memory.sv|../processor/processor.sv|../processor/wb_stage.sv|../processor/mem_stage.sv|../processor/ex_stage.sv|../processor/id_stage.sv|../processor/regfile.sv|../processor/if_stage.sv|../sys_defs.vh|
+Z9 !s108 1684018482.000000
+!s107 processor_tb.sv|memory.sv|../processor/forwarding.sv|../processor/processor.sv|../processor/wb_stage.sv|../processor/mem_stage.sv|../processor/ex_stage.sv|../processor/id_stage.sv|../processor/regfile.sv|../processor/if_stage.sv|../sys_defs.vh|
 Z10 !s90 -reportprogress|300|-f|files_rtl.f|
 !i113 1
 Z11 tCvgOpt 0
@@ -37,9 +37,9 @@ vex_stage
 R1
 R2
 !i10b 1
-!s100 X4L2GV_cceJ`Sieo@86Wm0
+!s100 ]X^^2BMC65k^jh>R8`lo92
 R3
-IPUl5T`OB8VWW`_JX6QI[K2
+IOT>mzBbP24aU<VCR76cMJ3
 R4
 S1
 R0
@@ -47,13 +47,62 @@ R5
 R6
 R7
 !i122 0
-L0 5 73
+L0 5 74
 R8
 r1
 !s85 0
 31
 R9
-Z12 !s107 processor_tb.sv|memory.sv|../processor/processor.sv|../processor/wb_stage.sv|../processor/mem_stage.sv|../processor/ex_stage.sv|../processor/id_stage.sv|../processor/regfile.sv|../processor/if_stage.sv|../sys_defs.vh|
+Z12 !s107 processor_tb.sv|memory.sv|../processor/forwarding.sv|../processor/processor.sv|../processor/wb_stage.sv|../processor/mem_stage.sv|../processor/ex_stage.sv|../processor/id_stage.sv|../processor/regfile.sv|../processor/if_stage.sv|../sys_defs.vh|
+R10
+!i113 1
+R11
+vForwardUnit
+R1
+R2
+!i10b 1
+!s100 ^FilBFAU=64bcDIInLQML2
+R3
+IQX>MVDco4F0[_5YHfU0?b0
+R4
+S1
+R0
+w1683999404
+8../processor/forwarding.sv
+F../processor/forwarding.sv
+!i122 0
+L0 1 66
+R8
+r1
+!s85 0
+31
+R9
+R12
+R10
+!i113 1
+R11
+n@forward@unit
+vhazard_unit
+R1
+R2
+!i10b 1
+!s100 dfG:_A1k5IJl[_Q;^liok3
+R3
+IDO6@KAOib9C9[IeSbTl>]1
+R4
+S1
+R0
+Z13 w1683914326
+Z14 8../processor/id_stage.sv
+Z15 F../processor/id_stage.sv
+!i122 0
+L0 300 24
+R8
+r1
+!s85 0
+31
+R9
+R12
 R10
 !i113 1
 R11
@@ -61,17 +110,17 @@ vid_stage
 R1
 R2
 !i10b 1
-!s100 2RUN::_^^a_EZ=Cm^hKT=2
+!s100 9TicdQ7zZ0d6mQlmgZzC>0
 R3
-ICP[a6OW09nlYJi=RGz:WG2
+IT1eGlUc[VG<V=_TDcLTeH1
 R4
 S1
 R0
-Z13 w1678628582
-Z14 8../processor/id_stage.sv
-Z15 F../processor/id_stage.sv
+R13
+R14
+R15
 !i122 0
-L0 159 131
+L0 160 138
 R8
 r1
 !s85 0
@@ -85,13 +134,13 @@ vif_stage
 R1
 R2
 !i10b 1
-!s100 IOQahiA6A`f5J1o:l:^MU1
+!s100 mo6]7=mjlM=1JZP=0a3fI2
 R3
-I5G7=61A3Bll`;7@8cK]0_0
+Iz51eI]Fa_2>4fha;X67dN2
 R4
 S1
 R0
-Z16 w1678538972
+w1683995891
 8../processor/if_stage.sv
 F../processor/if_stage.sv
 !i122 0
@@ -109,9 +158,9 @@ vinst_decoder
 R1
 R2
 !i10b 1
-!s100 md2??1L<XK`i7N1WS16R[2
+!s100 @DOiTDoUO1JXY;2o_mGXE2
 R3
-IDK_On8P^?nUg:R4@d1l=e2
+I@0VT7??8N^HoI0QM7BDdE2
 R4
 S1
 R0
@@ -119,7 +168,7 @@ R13
 R14
 R15
 !i122 0
-L0 7 148
+L0 7 149
 R8
 r1
 !s85 0
@@ -139,7 +188,7 @@ I2I]31C;_7hgYzz4b<fXNa3
 R4
 S1
 R0
-Z17 w1678820448
+w1678820448
 8memory.sv
 Fmemory.sv
 !i122 0
@@ -157,17 +206,17 @@ vmem_stage
 R1
 R2
 !i10b 1
-!s100 ]H1h?>i^TiYOQT1`Bb0QX3
+!s100 5LKI0EeTEodARb;?N0^8@3
 R3
-IRG2mXZ8eCOIJEN;[ce7<[1
+I]kj1k8LHmZReU]V=zX^k_0
 R4
 S1
 R0
-R16
+w1680442117
 8../processor/mem_stage.sv
 F../processor/mem_stage.sv
 !i122 0
-Z18 L0 5 27
+Z16 L0 5 27
 R8
 r1
 !s85 0
@@ -181,17 +230,17 @@ vprocessor
 R1
 R2
 !i10b 1
-!s100 Z52zzOCP5EmOH]MJoLOeK1
+!s100 dAPVnaL^1FJ:VHIk`fjB?0
 R3
-I=>^5o]@FW=m@Kl0KQW@hA0
+IC0>jHzVbGNQ54]azQiS2F2
 R4
 S1
 R0
-R16
+w1684018409
 8../processor/processor.sv
 F../processor/processor.sv
 !i122 0
-L0 5 428
+L0 5 547
 R8
 r1
 !s85 0
@@ -203,19 +252,19 @@ R10
 R11
 vprocessor_tb
 R1
-R2
+!s110 1684018484
 !i10b 1
-!s100 9fnkL14hB9OBii7zdjD6d3
+!s100 P]^ijP9YcF[:YjQRRYG?b3
 R3
-I4@V_bnOYaUmHId3T[9Vcj0
+IFSHHOX?jL^g>j5ko?N<F^2
 R4
 S1
 R0
-R17
+w1683812957
 8processor_tb.sv
 Fprocessor_tb.sv
 !i122 0
-L0 5 128
+L0 5 127
 R8
 r1
 !s85 0
@@ -235,11 +284,11 @@ I@C`4Tg9J8ASRe3mfSJ2BX3
 R4
 S1
 R0
-R16
+w1678538972
 8../processor/regfile.sv
 F../processor/regfile.sv
 !i122 0
-R18
+R16
 R8
 r1
 !s85 0
@@ -253,13 +302,13 @@ vwb_stage
 R1
 R2
 !i10b 1
-!s100 CZFGA4SgTH6D6kKgAFZ;Z2
+!s100 3EcPL:Piz:S0]:3Lb9zCA0
 R3
-IC8n8KQGV30UlFh^mLYdo^3
+IRNWBL=jKc``eJ>6]S_5;80
 R4
 S1
 R0
-R16
+w1680442146
 8../processor/wb_stage.sv
 F../processor/wb_stage.sv
 !i122 0

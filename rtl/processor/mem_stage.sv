@@ -10,7 +10,7 @@ module mem_stage(
     input logic   		ex_mem_rd_mem,      // read memory? (from decoder)
     input logic      	ex_mem_wr_mem,      // write memory? (from decoder)
     input logic [31:0] 	Dmem2proc_data,
-    input logic         ex_mem_valid_inst,
+
 
     output logic [31:0]	mem_result_out,    	// outgoing instruction result (to MEM/WB)
     output logic [1:0] 	proc2Dmem_command,	
@@ -19,7 +19,7 @@ module mem_stage(
 );
 
 // Determine the command that must be sent to mem
-assign proc2Dmem_command = 	(ex_mem_wr_mem & ex_mem_valid_inst) ? `BUS_STORE : (ex_mem_rd_mem & ex_mem_valid_inst) ? `BUS_LOAD : `BUS_NONE;
+assign proc2Dmem_command = 	(ex_mem_wr_mem ) ? `BUS_STORE : (ex_mem_rd_mem ) ? `BUS_LOAD : `BUS_NONE;
 
 // The memory address is calculated by the ALU
 assign proc2Dmem_addr = ex_mem_alu_result;
